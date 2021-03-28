@@ -1,0 +1,200 @@
+{
+	"info": {
+		"_postman_id": "c630a9a0-0019-43e7-bc1b-03bc5374b272",
+		"name": "Banco.atlantida.sv",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/**\r",
+							"\t* @author ManuelReyes\r",
+							"**/\r",
+							"const resp = pm.response.json();\r",
+							"if(responseCode.code === 200){ \r",
+							"    pm.test(\"PASS\", function () {\r",
+							"        pm.expect(responseCode.code).to.eql(200);\r",
+							"    });\r",
+							"    token = JSON.stringify(resp.respuesta.token); \r",
+							"    if(token.length > 0){ \r",
+							"        pm.environment.set(\"token\", resp.respuesta.token);\r",
+							"    } \r",
+							"}else{\r",
+							"    pm.test(\"FAIL\", function () {\r",
+							"        pm.expect(responseCode.code).to.eql(200);\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n\t\"user\":\"\",\r\n\t\"password\":\"\",\r\n\t\"key\":\"\",\r\n\t\"application\":\"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://www.equifax.com.sv/efx-app-ws-api360/v1/sv/service/auth",
+					"protocol": "https",
+					"host": [
+						"www",
+						"equifax",
+						"com",
+						"sv"
+					],
+					"path": [
+						"efx-app-ws-api360",
+						"v1",
+						"sv",
+						"service",
+						"auth"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Api360.sv",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"/**\r",
+							"\t* @author ManuelReyes\r",
+							"**/\r",
+							"const resp = pm.response.json();\r",
+							"let document = JSON.parse(pm.environment.get(\"documento\"));\r",
+							"// The opts for the server, also includes the data to be written to file\r",
+							"let opts = {\r",
+							"    //requestName: request.name || request.url,\r",
+							"    requestName:\"Banco_Atlantida_doc_\",\r",
+							"    fileExtension: 'json',\r",
+							"    mode: 'appendFile', // Change this to any function of the fs library of node to use it.\r",
+							"    \r",
+							"    uniqueIdentifier: document +\"_Response\",\r",
+							"    responseData: pm.response.text()\r",
+							"};\r",
+							"\r",
+							"pm.sendRequest({\r",
+							"    url: 'http://localhost:3000/write',\r",
+							"    method: 'POST',\r",
+							"    header: 'Content-Type:application/json',\r",
+							"    body: {\r",
+							"        mode: 'raw',\r",
+							"        raw: JSON.stringify(opts)\r",
+							"    }\r",
+							"}, function (err, res) {\r",
+							"    console.log(res);\r",
+							"});\r",
+							"\r",
+							"if(responseCode.code === 200){ \r",
+							"    pm.test(\"PASS\", function () {\r",
+							"        pm.expect(responseCode.code).to.eql(200);\r",
+							"    });\r",
+							"    console.log(resp);\r",
+							"}else{\r",
+							"    pm.test(\"FAIL\", function () {\r",
+							"        pm.expect(responseCode.code).to.eql(200);\r",
+							"    });\r",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"documento\", data.documento);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "{{token}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"tipoDocumento\": \"{{tipoDocumento}}\",\r\n    \"documento\": {{documento}},\r\n    \"tipoPersona\": \"1\",\r\n    \"consentimiento\": \"1\",\r\n    \"reporte\": false\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://www.equifax.com.sv/efx-app-ws-api360/v1/sv/service/informacionBureau",
+					"protocol": "https",
+					"host": [
+						"www",
+						"equifax",
+						"com",
+						"sv"
+					],
+					"path": [
+						"efx-app-ws-api360",
+						"v1",
+						"sv",
+						"service",
+						"informacionBureau"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
